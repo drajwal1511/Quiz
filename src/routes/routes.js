@@ -31,7 +31,7 @@ app.post('/create',async(req,res)=>{
     //pos and neg marks set for quiz_questions
     //Expecting all parameter for quiz_sections_info
     //Expecting only ques_id in quiz_questions array
-    if(sections_info[0][0]==null && questions.length[0]==1){
+    if(sections_info[0][0]==null){
         for(var i=0;i<questions.length;i++){
             questions[i].push(sections_info[0][0],sections_info[i][4],sections_info[i][5])
         }
