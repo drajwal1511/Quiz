@@ -9,19 +9,17 @@ app.use(express.json())
 
 
 // {
-//     "quiz_id":1,
 //     "quiz_name":"Chem",
 //     "quiz_timer":"Yes",
 //     "quiz_timer_type":"whole",
 //     "quiz_timer_time":"demo",
 //     "quiz_have_sections":"No",
 //     "quiz_sections_info":"[[null,15,15,15,1,0]]",
-//     "quiz_questions":"[[1]]"
+//     "quiz_questions":"[[1,null]]"
 // }
 
 
 // {
-//     "quiz_id":1,
 //     "quiz_name":"Chem",
 //     "quiz_timer":"Yes",
 //     "quiz_timer_type":"whole",
@@ -39,7 +37,6 @@ app.post('/create',async(req,res)=>{
     //Yes=>For each section set quiz_questions
 
     let {
-        quiz_id,
         quiz_name,
         quiz_timer,
         quiz_timer_type,
@@ -58,7 +55,7 @@ app.post('/create',async(req,res)=>{
     //Expecting only ques_id in quiz_questions array
     if(sections_info[0][0]==null){
         for(var i=0;i<questions.length;i++){
-            questions[i].push(sections_info[0][0],sections_info[i][4],sections_info[i][5])
+            questions[i].push(sections_info[i][4],sections_info[i][5])
         }
     }
 
@@ -109,7 +106,6 @@ app.post('/create',async(req,res)=>{
 
 
 // {
-//     "question_id":1,
 //     "question_tag_1":"computer",
 //     "question_tag_2":"quiz",
 //     "question_body":"Body",
@@ -124,7 +120,6 @@ app.post('/create',async(req,res)=>{
 
 app.post("/create-question",async(req,res)=>{
     let {
-        question_id,
         question_tag_1,
         question_tag_2,
         question_body,
@@ -134,7 +129,7 @@ app.post("/create-question",async(req,res)=>{
         scale_options,//[[scalename1, scalevalue1]]
         match_options,//[[option1(a)body, option1(a)url, option1(b)body, option1(b)url]]
         question_answer,
-        question_explaination
+        question_explanation
     }=req.body;
 
     const questions = await question_table.create(
@@ -148,7 +143,7 @@ app.post("/create-question",async(req,res)=>{
             scale_options:scale_options,//[[scalename1, scalevalue1]]
             match_options:match_options,//[[option1(a)body, option1(a)url, option1(b)body, option1(b)url]]
             question_answer:question_answer,
-            question_explaination:question_explaination
+            question_explanation:question_explanation
         }
     )
     .then(()=>{

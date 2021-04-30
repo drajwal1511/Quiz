@@ -10,11 +10,11 @@ const quiz_table = db.define('quiz_table', {
     },
     quiz_name: {
         type: DataTypes.STRING,
-        defaultValue: null
+        allowNull: false,
     },
     quiz_timer: {
         type: DataTypes.STRING,
-        defaultValue: null
+        allowNull: false,
     },
     quiz_timer_type: {
         type: DataTypes.STRING,
@@ -26,15 +26,15 @@ const quiz_table = db.define('quiz_table', {
     },
     quiz_have_sections: {
         type: DataTypes.STRING,
-        defaultValue: null
+        allowNull: false,
     },
     quiz_section_info: {
         type: DataTypes.TEXT('long'),
-        defaultValue: null
+        allowNull: false,
     },
     quiz_questions: {
         type: DataTypes.TEXT('long'),
-        defaultValue: null
+        allowNull: false,
     }
 });
 

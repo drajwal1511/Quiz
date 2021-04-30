@@ -10,9 +10,13 @@ const question_table = db.define('question_table', {
     },
     question_tag_1: {
         type: DataTypes.STRING,
-        defaultValue: null
+        allowNull: false,
     },
     question_tag_2: {
+        type: DataTypes.STRING,
+        defaultValue: null
+    },
+    question_body: {
         type: DataTypes.STRING,
         defaultValue: null
     },
@@ -22,7 +26,7 @@ const question_table = db.define('question_table', {
     },
     question_type: {
         type: DataTypes.STRING,
-        defaultValue: null
+        allowNull: false,
     },
     question_options:{
         type: DataTypes.TEXT('long'),
