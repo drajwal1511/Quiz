@@ -24,6 +24,18 @@ const question_table = db.define('question_table', {
         type: DataTypes.STRING,
         defaultValue: null
     },
+    question_options:{
+        type: DataTypes.TEXT('long'),
+        defaultValue: null
+    },
+    scale_options:{
+        type: DataTypes.TEXT('long'),
+        defaultValue: null
+    },
+    match_options:{
+        type: DataTypes.TEXT('long'),
+        defaultValue: null
+    },
     question_answer: {
         type: DataTypes.STRING,
         defaultValue: null
