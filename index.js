@@ -59,7 +59,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
  *        name: body
  *        description: creating question
  *        required: true
- *        example: {"question_tag_1":"computer","question_tag_2":"quiz","question_body":"Body","question_body_img_url":"URL","question_type":"mcq","question_options":"[['body','body_url']]","scale_options":"[['scalename1','scalevalue1']]","match_options":"[['option1(a)body', 'option1(a)url', 'option1(b)body', 'option1(b)url']]","question_answer":"Ans","question_explaination":"Explain"}
+ *        example: {"question_tag_1":"computer","question_tag_2":"quiz","question_body":"Body","question_body_img_url":"URL","question_type":"mcq","question_options":"[['body','body_url']]","scale_options":"[['scalename1','scalevalue1']]","match_options":"[['option1(a)body', 'option1(a)url', 'option1(b)body', 'option1(b)url']]","question_answer":"Ans","question_explanation":"Explain"}
  *    responses:
  *      '200':
  *        description: successful operation
