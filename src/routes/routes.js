@@ -34,7 +34,7 @@ app.use(express.json())
 //     "quiz_questions":"[[1,1],[2,2],[3,2],[4,1]]"
 // }
 
-app.post('/create', async (req, res) => {
+app.post('/create', cors(),async (req, res) => {
 
     //Basic concepts of this route:
     //Does the quiz have sections
