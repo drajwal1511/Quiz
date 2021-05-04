@@ -45,7 +45,17 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
  *      '200':
  *        description: successful operation
  */
-
+/**
+ * @swagger
+ * /questions:
+ *  get:
+ *    tags:
+ *      - get all questions
+ *    summary: get all the questions available
+ *    responses:
+ *      '200':
+ *        description: successful operation
+ */
 
 /**
  * @swagger
