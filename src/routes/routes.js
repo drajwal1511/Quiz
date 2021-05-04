@@ -42,17 +42,17 @@ app.post('/create',cors(),async (req, res) => {
     //No=>section_name=null, and set quiz_questions section_name=null, pos_marks=pos_marks, neg_marks=neq_marks
     //Yes=>For each section set quiz_questions
     res.send(req.body);
-    let {
-        quiz_name,
-        quiz_timer,
-        quiz_timer_type,
-        quiz_timer_time,
-        quiz_have_sections,
-        quiz_sections_info,//[[section_name,no_of_ques,no_of_ques_to_show,max_marks,pos_marks,neg_marks]]
-        quiz_questions//[[ques_id,section_name,pos_marks,neq_marks]]
-    } = req.body;
-    sections_info = JSON.parse(quiz_sections_info)
-    questions = JSON.parse(quiz_questions)
+    // let {
+    //     quiz_name,
+    //     quiz_timer,
+    //     quiz_timer_type,
+    //     quiz_timer_time,
+    //     quiz_have_sections,
+    //     quiz_sections_info,//[[section_name,no_of_ques,no_of_ques_to_show,max_marks,pos_marks,neg_marks]]
+    //     quiz_questions//[[ques_id,section_name,pos_marks,neq_marks]]
+    // } = req.body;
+    // sections_info = JSON.parse(quiz_sections_info)
+    // questions = JSON.parse(quiz_questions)
 
     //Marks common for all sections
     //pos and neg marks set for quiz_questions
