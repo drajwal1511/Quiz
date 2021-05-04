@@ -11,7 +11,7 @@ const fetch = require("node-fetch");
 const csv = require("csv-parser");
 var cors = require('cors')
 app.use(express.json())
-
+app.use(cors());
 
 // {
 //     "quiz_name":"Chem",
@@ -34,14 +34,15 @@ app.use(express.json())
 //     "quiz_questions":"[[1,1],[2,2],[3,2],[4,1]]"
 // }
 
-app.post('/create',cors(),async (req, res) => {
+app.post('/create',async (req, res) => {
     console.log("hit");
 
     //Basic concepts of this route:
     //Does the quiz have sections
     //No=>section_name=null, and set quiz_questions section_name=null, pos_marks=pos_marks, neg_marks=neq_marks
     //Yes=>For each section set quiz_questions
-    res.send(req.body);
+    console.log(req.body);
+    res.sendStatus(200);
     // let {
     //     quiz_name,
     //     quiz_timer,
@@ -109,7 +110,7 @@ app.post('/create',cors(),async (req, res) => {
     //     })
 })
 
-app.get("/questions", cors(),async (req, res) => {
+app.get("/questions",async (req, res) => {
     console.log("all questions request received");
     var allQuestions = await question_table.findAll();
     var dataToSend = [];
