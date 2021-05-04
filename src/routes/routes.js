@@ -109,7 +109,7 @@ app.post('/create', async (req, res) => {
         })
 })
 
-app.get("/questions",async (req, res) => {
+app.get("/questions", cors(),async (req, res) => {
     console.log("all questions request received");
     var allQuestions = await question_table.findAll();
     var dataToSend = [];
