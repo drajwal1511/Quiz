@@ -222,7 +222,8 @@ app.post("/create-question-bulk", upload.single('csvFileBulk'), async (req, res)
         .on('end', async () => {
             console.log("CLOSED");
             var allPromises = excelData.map(async data => {
-                if (data[8].length == 2) {
+                var countOptions = data[8][1].split(",");
+                if (countOptions.length==1) {
                     questionType = "single_correct_question";
                 } else {
                     questionType = "multiple_correct_question";
