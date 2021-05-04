@@ -65,6 +65,26 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
  *        description: successful operation
  */
 
+/**
+ * @swagger
+ * /create-question-bulk:
+ *  post:
+ *    tags:
+ *      - create question bulk
+ *    summary: creating question in bulk using a .csv file
+ *    consumes:
+ *      - multipart/form-data
+ *    parameters:
+ *      - in: formData
+ *        name: csvFileBulk
+ *        type: file
+ *        description: the .csv file for creating questions in bulk
+ *        required: true
+ *    responses:
+ *      '200':
+ *        description: successful operation
+ */
+
 app.use('/',routes);
 
 app.listen(PORT,()=>{
