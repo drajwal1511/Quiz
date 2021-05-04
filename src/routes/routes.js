@@ -9,6 +9,7 @@ const fs = require("fs");
 const ENV = require("../../env");
 const fetch = require("node-fetch");
 const csv = require("csv-parser");
+var cors = require('cors')
 app.use(express.json())
 
 
@@ -108,7 +109,7 @@ app.post('/create', async (req, res) => {
         })
 })
 
-app.get("/questions", async (req, res) => {
+app.get("/questions", cors(),async (req, res) => {
     var allQuestions = await question_table.findAll();
     var dataToSend = [];
     for (var i = 0; i < allQuestions.length; i++) {
