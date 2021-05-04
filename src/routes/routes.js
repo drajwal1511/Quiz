@@ -108,7 +108,19 @@ app.post('/create', async (req, res) => {
         })
 })
 
-
+app.get("/questions", async (req, res) => {
+    var allQuestions = await question_table.findAll();
+    var dataToSend = [];
+    for (var i = 0; i < allQuestions.length; i++) {
+        dataToSend.push({
+            id: allQuestions[i].dataValues.question_id,
+            Tags1: allQuestions[i].dataValues.question_tag_1,
+            Tags2: allQuestions[i].dataValues.question_tag_2,
+            Question: allQuestions[i].dataValues.question_body
+        });
+    }
+    res.send(dataToSend);
+})
 // {
 //     "question_tag_1":"computer",
 //     "question_tag_2":"quiz",
@@ -238,11 +250,11 @@ app.post("/create-question-bulk", upload.single('csvFileBulk'), async (req, res)
                     question_answer: questionAnswer
                 })
             })
-            const results = await Promise.all(allPromises.map(p=>p.catch(e=>e)));
+            const results = await Promise.all(allPromises.map(p => p.catch(e => e)));
             const validResults = results.filter(result => !(result instanceof Error));
             // console.log(validResults);
             res.sendStatus(200).json({
-                success:1
+                success: 1
             })
         })
 })
