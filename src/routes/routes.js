@@ -231,15 +231,15 @@ app.post("/create-question-bulk", upload.single('csvFileBulk'), async (req, res)
                 } else {
                     questionType = "multiple_correct_question";
                 }
-                var questionOption = "[[";
+                var questionOption = "[[\"";
                 questionOption += data[4][1];
-                questionOption += ",null],[";
+                questionOption += "\",null],[\"";
                 questionOption += data[5][1];
-                questionOption += ",null],[";
+                questionOption += "\",null],[\"";
                 questionOption += data[6][1];
-                questionOption += ",null],[";
+                questionOption += "\",null],[\"";
                 questionOption += data[6][1];
-                questionOption += ",null]]";
+                questionOption += "\",null]]";
                 // console.log(questionOption);
                 var questionAnswer = "[";
                 questionAnswer += data[8][1];
