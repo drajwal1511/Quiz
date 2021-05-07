@@ -1,18 +1,18 @@
-const express=require('express');
-const app=express();
-const routes=require('./src/routes/routes');
-const {PORT}=require('./env');
+const express = require('express');
+const app = express();
+const routes = require('./src/routes/routes');
+const { PORT } = require('./env');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-
+const cors = require("cors");
 require('./src/models/question_table');
 require('./src/models/quiz_table');
 
 
 //Swagger initialization
-const swaggerOptions={
-    swaggerDefinition:{
-        info:{
+const swaggerOptions = {
+    swaggerDefinition: {
+        info: {
             title: 'Checkout',
             description: 'Checkout Documentation',
             contact: {
@@ -94,9 +94,14 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
  *      '200':
  *        description: successful operation
  */
+app.use(
+    cors({
+        origin: true,
+        credentials: true,
+    })
+);
+app.use('/', routes);
 
-app.use('/',routes);
-
-app.listen(PORT,()=>{
+app.listen(PORT, () => {
     console.log("Server started");
 })

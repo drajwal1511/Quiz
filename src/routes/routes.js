@@ -34,75 +34,111 @@ app.use(cors());
 //     "quiz_questions":"[[1,1],[2,2],[3,2],[4,1]]"
 // }
 
-app.post('/create',async (req, res) => {
-    console.log("hit");
-
+app.post('/create', async (req, res) => {
     //Basic concepts of this route:
     //Does the quiz have sections
-    //No=>section_name=null, and set quiz_questions section_name=null, pos_marks=pos_marks, neg_marks=neq_marks
+    //No=>section_name="", and set quiz_questions section_name="", pos_marks=pos_marks, neg_marks=neq_marks
     //Yes=>For each section set quiz_questions
-    // console.log(req.body);
-    // res.sendStatus(200);
-    let {
-        quiz_name,
-        quiz_timer,
-        quiz_timer_type,
-        quiz_timer_time,
-        quiz_have_sections,
-        quiz_sections_info,//[[section_name,no_of_ques,no_of_ques_to_show,max_marks,pos_marks,neg_marks]]
-        quiz_questions//[[ques_id,section_name,pos_marks,neq_marks]]
-    } = req.body;
-    sections_info = JSON.parse(quiz_sections_info)
-    questions = JSON.parse(quiz_questions)
-
-    //Marks common for all sections
-    //pos and neg marks set for quiz_questions
-    //Expecting all parameter for quiz_sections_info
-    //Expecting only ques_id in quiz_questions array
-    if (sections_info[0][0] == null) {
-        for (var i = 0; i < questions.length; i++) {
-            questions[i].push(sections_info[i][4], sections_info[i][5])
+    var quizTimer = "Yes";
+    var quizTimerType = null;
+    var quizTimerTime = null;
+    if (!req.body.quiz_timer) {
+        quizTimer = "No";
+    } else {
+        if (req.body.quiz_timer_type == "Whole Quiz") {
+            // whole quiz
+            quizTimerType = "whole";
+        } else {
+            // per question
+            quizTimerType = "per";
+        }
+        quizTimerTime = req.body.quiz_timer_time;
+    }
+    var quizHaveSections = "Yes";
+    if (!req.body.quiz_have_sections) {
+        quizHaveSections = "No";
+    }
+    var quizSectionsInfo = "[";
+    for (var i = 0; i < req.body.quiz_sections_info.length; i++) {
+        quizSectionsInfo += '[\"';
+        quizSectionsInfo += req.body.quiz_sections_info[i].name;
+        quizSectionsInfo += "\",";
+        quizSectionsInfo += req.body.quiz_sections_info[i].questionSelect;
+        quizSectionsInfo += ",";
+        quizSectionsInfo += req.body.quiz_sections_info[i].questionShow;
+        quizSectionsInfo += ",";
+        quizSectionsInfo += req.body.quiz_sections_info[i].maximumMarks;
+        quizSectionsInfo += ",";
+        if (req.body.quiz_sections_info[i].posMarks != undefined) {
+            quizSectionsInfo += req.body.quiz_sections_info[i].posMarks;
+        } else {
+            quizSectionsInfo += '';
+        }
+        quizSectionsInfo += ",";
+        if (req.body.quiz_sections_info[i].negMarks != undefined) {
+            quizSectionsInfo += req.body.quiz_sections_info[i].negMarks;
+        } else {
+            quizSectionsInfo += '';
+        }
+        quizSectionsInfo += "]";
+        if (i != (req.body.quiz_sections_info.length - 1)) {
+            quizSectionsInfo += ",";
         }
     }
-
-    // //Marks common for sections
-    // //section name with pos and neg marks for each section
-    for (var i = 0; i < sections_info.length; i++) {
-        if (sections_info[i][0] != null) {
-            for (var j = 0; j < questions.length; j++) {
-                if (questions[j][1] == sections_info[i][0]) {
-                    questions[j].push(sections_info[i][4], sections_info[i][5])
+    quizSectionsInfo += "]";
+    var quizQuestions = "[";
+    for (var i = 0; i < req.body.quiz_questions.length; i++) {
+        quizQuestions += "[";
+        quizQuestions += req.body.quiz_questions[i].question_id;
+        quizQuestions += ",";
+        quizQuestions += req.body.quiz_questions[i].sectionName;
+        quizQuestions += ",";
+        var markingGivenInSection = false;
+        for (var j = 0; j < req.body.quiz_sections_info.length; j++) {
+            if (req.body.quiz_sections_info[j].name == req.body.quiz_questions[i].sectionName) {
+                if (req.body.quiz_sections_info[j].posMarks != undefined && req.body.quiz_sections_info[j].negMarks != undefined) {
+                    markingGivenInSection = true;
+                    quizQuestions += req.body.quiz_sections_info[j].posMarks;
+                    quizQuestions += ",";
+                    quizQuestions += req.body.quiz_sections_info[j].negMarks;
+                    quizQuestions += ",";
                 }
+                break;
             }
         }
-    }
-
-    //Marks for each ques
-    //update quiz_questions for each ques
-    //Directly put data in database
-
-
-
-    // const quiz = await sequelize.query("INSERT INTO `quiz_table`() VALUES ", 
-
-    // { type: QueryTypes.SELECT });
-    const quizzes = await quiz_table.create(
-        {
-            quiz_name: quiz_name,
-            quiz_timer: quiz_timer,
-            quiz_timer_type: quiz_timer_type,
-            quiz_timer_time: quiz_timer_time,
-            quiz_have_sections: quiz_have_sections,
-            quiz_section_info: JSON.stringify(sections_info),
-            quiz_questions: JSON.stringify(questions)
+        if (!markingGivenInSection) {
+            if (req.body.quiz_questions[i].posMarks != undefined && req.body.quiz_questions[i].negMarks != undefined) {
+                quizQuestions += req.body.quiz_questions[i].posMarks;
+                quizQuestions += ",";
+                quizQuestions += req.body.quiz_questions[i].negMarks;
+                quizQuestions += ",";
+            } else {
+                quizQuestions += ",";
+                quizQuestions += ",";
+            }
         }
-    )
+        quizQuestions += ']';
+        if (i != req.body.quiz_questions.length - 1) {
+            quizQuestions += ",";
+        }
+    }
+    quizQuestions += "]";
+    var obj = {
+        quiz_name: req.body.quiz_name,
+        quiz_timer: quizTimer,
+        quiz_timer_type: quizTimerType,
+        quiz_timer_time: quizTimerTime,
+        quiz_have_sections: quizHaveSections,
+        quiz_section_info: quizSectionsInfo,
+        quiz_questions: quizQuestions
+    }
+    const newQuiz = await quiz_table.create(obj)
         .then(() => {
             res.status(200).json({
                 success: 1
             })
         })
-        .catch((error) => {
+        .catch(e => {
             res.status(500).json({
                 success: 0,
                 error: error
@@ -110,7 +146,7 @@ app.post('/create',async (req, res) => {
         })
 })
 
-app.get("/questions",async (req, res) => {
+app.get("/questions", async (req, res) => {
     console.log("all questions request received");
     var allQuestions = await question_table.findAll();
     var dataToSend = [];
@@ -226,7 +262,7 @@ app.post("/create-question-bulk", upload.single('csvFileBulk'), async (req, res)
             console.log("CLOSED");
             var allPromises = excelData.map(async data => {
                 var countOptions = data[8][1].split(",");
-                if (countOptions.length==1) {
+                if (countOptions.length == 1) {
                     questionType = "single_correct_question";
                 } else {
                     questionType = "multiple_correct_question";
