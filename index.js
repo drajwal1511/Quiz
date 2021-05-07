@@ -40,7 +40,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
  *        name: body
  *        description: creating quiz
  *        required: true
- *        example: {"quiz_name":"Chem","quiz_timer":"Yes","quiz_timer_type":"whole","quiz_timer_time":"demo","quiz_have_sections":"No","quiz_sections_info":"[[null,15,15,15,1,0]]","quiz_questions":"[[1,null]]"}
+ *        example: {"quiz_name":"Chem","quiz_timer":true,"quiz_timer_type":"Whole Quiz","quiz_timer_time":50,"quiz_have_sections":false,"quiz_sections_info":[{"name":'',"questionSelect":15,"questionShow":15,"maximumMarks":15,"posMarks":1,"negMarks":0}],"quiz_questions":[{"question_id":1,"sectionName":''},{"question_id":2,"sectionName":''}]}
  *    responses:
  *      '200':
  *        description: successful operation

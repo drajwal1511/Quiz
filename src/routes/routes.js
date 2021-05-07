@@ -90,9 +90,9 @@ app.post('/create', async (req, res) => {
     for (var i = 0; i < req.body.quiz_questions.length; i++) {
         quizQuestions += "[";
         quizQuestions += req.body.quiz_questions[i].question_id;
-        quizQuestions += ",";
+        quizQuestions += ",\"";
         quizQuestions += req.body.quiz_questions[i].sectionName;
-        quizQuestions += ",";
+        quizQuestions += "\",";
         var markingGivenInSection = false;
         for (var j = 0; j < req.body.quiz_sections_info.length; j++) {
             if (req.body.quiz_sections_info[j].name == req.body.quiz_questions[i].sectionName) {
@@ -101,7 +101,6 @@ app.post('/create', async (req, res) => {
                     quizQuestions += req.body.quiz_sections_info[j].posMarks;
                     quizQuestions += ",";
                     quizQuestions += req.body.quiz_sections_info[j].negMarks;
-                    quizQuestions += ",";
                 }
                 break;
             }
