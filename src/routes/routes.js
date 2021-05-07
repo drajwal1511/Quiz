@@ -60,9 +60,15 @@ app.post('/create', async (req, res) => {
     }
     var quizSectionsInfo = "[";
     for (var i = 0; i < req.body.quiz_sections_info.length; i++) {
-        quizSectionsInfo += '[\"';
-        quizSectionsInfo += req.body.quiz_sections_info[i].name;
-        quizSectionsInfo += "\",";
+        if(req.body.quiz_sections_info[i].name==""){
+            quizSectionsInfo += '[';
+            quizSectionsInfo +="null";    
+            quizSectionsInfo += ',';
+        }else{
+            quizSectionsInfo += '[\"';
+            quizSectionsInfo += req.body.quiz_sections_info[i].name;
+            quizSectionsInfo += "\",";
+        }
         quizSectionsInfo += req.body.quiz_sections_info[i].questionSelect;
         quizSectionsInfo += ",";
         quizSectionsInfo += req.body.quiz_sections_info[i].questionShow;
@@ -72,13 +78,13 @@ app.post('/create', async (req, res) => {
         if (req.body.quiz_sections_info[i].posMarks != undefined) {
             quizSectionsInfo += req.body.quiz_sections_info[i].posMarks;
         } else {
-            quizSectionsInfo += '';
+            quizSectionsInfo += 'null';
         }
         quizSectionsInfo += ",";
         if (req.body.quiz_sections_info[i].negMarks != undefined) {
             quizSectionsInfo += req.body.quiz_sections_info[i].negMarks;
         } else {
-            quizSectionsInfo += '';
+            quizSectionsInfo += 'null';
         }
         quizSectionsInfo += "]";
         if (i != (req.body.quiz_sections_info.length - 1)) {
@@ -90,9 +96,17 @@ app.post('/create', async (req, res) => {
     for (var i = 0; i < req.body.quiz_questions.length; i++) {
         quizQuestions += "[";
         quizQuestions += req.body.quiz_questions[i].question_id;
-        quizQuestions += ",\"";
-        quizQuestions += req.body.quiz_questions[i].sectionName;
-        quizQuestions += "\",";
+        
+        if(req.body.quiz_questions[i].sectionName==""){
+            quizQuestions += ",";
+            quizQuestions += "null";
+            quizQuestions += ",";
+        }else{
+            quizQuestions += ",\"";
+            quizQuestions += req.body.quiz_questions[i].sectionName;
+            quizQuestions += "\",";
+        }
+        
         var markingGivenInSection = false;
         for (var j = 0; j < req.body.quiz_sections_info.length; j++) {
             if (req.body.quiz_sections_info[j].name == req.body.quiz_questions[i].sectionName) {
@@ -110,10 +124,8 @@ app.post('/create', async (req, res) => {
                 quizQuestions += req.body.quiz_questions[i].posMarks;
                 quizQuestions += ",";
                 quizQuestions += req.body.quiz_questions[i].negMarks;
-                quizQuestions += ",";
             } else {
-                quizQuestions += ",";
-                quizQuestions += ",";
+                quizQuestions += "null,null";
             }
         }
         quizQuestions += ']';
