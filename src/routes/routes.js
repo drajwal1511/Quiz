@@ -9,7 +9,8 @@ const fs = require("fs");
 const ENV = require("../../env");
 const fetch = require("node-fetch");
 const csv = require("csv-parser");
-var cors = require('cors')
+var cors = require('cors');
+const cmd = require("node-cmd");
 app.use(express.json())
 app.use(cors());
 
@@ -60,11 +61,11 @@ app.post('/create', async (req, res) => {
     }
     var quizSectionsInfo = "[";
     for (var i = 0; i < req.body.quiz_sections_info.length; i++) {
-        if(req.body.quiz_sections_info[i].name==""){
+        if (req.body.quiz_sections_info[i].name == "") {
             quizSectionsInfo += '[';
-            quizSectionsInfo +="null";    
+            quizSectionsInfo += "null";
             quizSectionsInfo += ',';
-        }else{
+        } else {
             quizSectionsInfo += '[\"';
             quizSectionsInfo += req.body.quiz_sections_info[i].name;
             quizSectionsInfo += "\",";
@@ -96,17 +97,17 @@ app.post('/create', async (req, res) => {
     for (var i = 0; i < req.body.quiz_questions.length; i++) {
         quizQuestions += "[";
         quizQuestions += req.body.quiz_questions[i].question_id;
-        
-        if(req.body.quiz_questions[i].sectionName==""){
+
+        if (req.body.quiz_questions[i].sectionName == "") {
             quizQuestions += ",";
             quizQuestions += "null";
             quizQuestions += ",";
-        }else{
+        } else {
             quizQuestions += ",\"";
             quizQuestions += req.body.quiz_questions[i].sectionName;
             quizQuestions += "\",";
         }
-        
+
         var markingGivenInSection = false;
         for (var j = 0; j < req.body.quiz_sections_info.length; j++) {
             if (req.body.quiz_sections_info[j].name == req.body.quiz_questions[i].sectionName) {
@@ -260,7 +261,7 @@ var storage = multer.diskStorage({
 })
 var upload = multer({ storage: storage })
 // name of file is assumed csvFileBulk, this route will accept a csv file and create those mcq questions
-app.post("/create-question-bulk", upload.single('csvFileBulk'), async (req, res) => {
+app.post("/create-bulk", upload.single('bulk-file'), async (req, res) => {
     var excelData = [];
     console.log("Starting to read file");
     fs.createReadStream("./uploads/" + req.file.filename)
@@ -271,6 +272,11 @@ app.post("/create-question-bulk", upload.single('csvFileBulk'), async (req, res)
         })
         .on('end', async () => {
             console.log("CLOSED");
+            console.log("removing file");
+            const commandToRun = 'rm -r ./uploads/' + req.file.filename;
+            console.log(commandToRun);
+            const commands = cmd.runSync(commandToRun);
+            console.log(commands);
             var allPromises = excelData.map(async data => {
                 var countOptions = data[8][1].split(",");
                 if (countOptions.length == 1) {

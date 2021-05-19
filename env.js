@@ -1,5 +1,5 @@
 module.exports={
-    PORT:5003,
+    PORT:5000,
     MYSQL_DATABASE : "trial_database",
     MYSQL_USER : "admin",
     MYSQL_ROOT_PASSWORD : "admin1234",
