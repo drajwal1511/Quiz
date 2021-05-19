@@ -100,7 +100,7 @@ app.use(
     })
 );
 // Body Parser
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(fileupload());
 app.use('/', routes);

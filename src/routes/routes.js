@@ -186,9 +186,7 @@ app.get("/questions", async (req, res) => {
 
 // for multiple files
 app.post("/create-question", async (req, res) => {
-    // if there is img with the body
-    console.log(req.files);
-    console.log(req.body);
+    // console.log(req.body);
     // if (req.files.question_body_img_url.length != 0) {
     //     var body_img = req.files.question_body_img_url[0];
     //     var url = "https://storage.bunnycdn.com/" + ENV.SZ_NAME + "/" + ENV.SZ_PATH + "/" + body_img.filename;
@@ -201,44 +199,111 @@ app.post("/create-question", async (req, res) => {
     //     req.body.question_body_img_url = null;
     // }
     // console.log(req.body.question_body_img_url);
-    // let {
-    //     question_tag_1,
-    //     question_tag_2,
-    //     question_body,
-    //     question_body_img_url,
-    //     question_type,
-    //     question_options,//[[body,body_img_url]]
-    //     scale_options,//[[scalename1, scalevalue1]]
-    //     match_options,//[[option1(a)body, option1(a)url, option1(b)body, option1(b)url]]
-    //     question_answer,
-    //     question_explanation
-    // } = req.body;
-
-    // const questions = await question_table.create(
-    //     {
-    //         question_tag_1: question_tag_1,
-    //         question_tag_2: question_tag_2,
-    //         question_body: question_body,
-    //         question_body_img_url: question_body_img_url,
-    //         question_type: question_type,
-    //         question_options: question_options,//[[body,body_img_url]]
-    //         scale_options: scale_options,//[[scalename1, scalevalue1]]
-    //         match_options: match_options,//[[option1(a)body, option1(a)url, option1(b)body, option1(b)url]]
-    //         question_answer: question_answer,
-    //         question_explanation: question_explanation
-    //     }
-    // )
-    //     .then(() => {
-    //         res.status(200).json({
-    //             success: 1
-    //         })
-    //     })
-    //     .catch((error) => {
-    //         res.status(500).json({
-    //             success: 0,
-    //             error: error
-    //         })
-    //     })
+    let {
+        question_tag_1,
+        question_tag_2,
+        question_body,
+        question_type,
+    } = req.body;
+    var answer = JSON.parse(req.body.other);
+    // console.log(answer);
+    if (question_type == 'Single word') {
+        await question_table.create({
+            question_tag_1: question_tag_1,
+            question_tag_2: question_tag_2,
+            question_body: question_body,
+            question_type: 'single_word',
+            question_answer: answer.answer
+        })
+    } else if (question_type == 'Integer') {
+        await question_table.create({
+            question_tag_1: question_tag_1,
+            question_tag_2: question_tag_2,
+            question_body: question_body,
+            question_type: 'integer',
+            question_answer: answer.answer
+        })
+    } else if (question_type == 'MCQ') {
+        var options = answer.options;
+        answer = answer.answers;
+        var questionType;
+        if (answer.length == 1) {
+            questionType = 'single_correct_type';
+        } else {
+            questionType = 'multiple_correct_type';
+        }
+        var questionOptions = '[';
+        for (var i = 0; i < options.length; i++) {
+            questionOptions += '["';
+            questionOptions += options[i].option;
+            questionOptions += '",null';
+            questionOptions += ']';
+            if (i != options.length - 1) {
+                questionOptions += ',';
+            }
+        }
+        questionOptions += ']';
+        var questionAnswers = '[';
+        for (var i = 0; i < answer.length; i++) {
+            questionAnswers += ('option' + (answer[i]+1));
+            if (i != answer.length - 1) {
+                questionAnswers += ', ';
+            }
+        }
+        questionAnswers += ']';
+        var obj = {
+            question_tag_1: question_tag_1,
+            question_tag_2: question_tag_2,
+            question_body: question_body,
+            question_type: questionType,
+            question_options: questionOptions,
+            question_answer: questionAnswers
+        }
+        await question_table.create(obj);
+    } else if (question_type == 'Match the pairs') {
+        answer = answer.answer;
+        question_type = 'match';
+        var matchOptions = '[';
+        for (var i = 0; i < answer.length; i++) {
+            matchOptions += '[';
+            matchOptions += ('"'+answer[i].lhs+'","'+answer[i].rhs+'"')
+                matchOptions += ']';
+            if (i != answer.length - 1) {
+                matchOptions += ',';
+            }
+        }
+        matchOptions += ']';
+        var obj = {
+            question_tag_1: question_tag_1,
+            question_tag_2: question_tag_2,
+            question_body: question_body,
+            question_type: question_type,
+            match_options:matchOptions
+        }
+        await question_table.create(obj);   
+    }else if(question_type='Slider'){
+        var scales = answer.answer;
+        // console.log(scales);
+        question_type = 'slide';
+        var scaleOptions = '[';
+        for(var i=0;i<scales.length;i++){
+            scaleOptions += '[';
+            scaleOptions+=('"'+scales[i].name+'",'+scales[i].value)
+            scaleOptions += ']';
+            if(i!=scales.length-1){
+                scaleOptions+=',';
+            }
+        }
+        scaleOptions+=']';
+        var obj = {
+            question_tag_1: question_tag_1,
+            question_tag_2: question_tag_2,
+            question_body: question_body,
+            question_type: question_type,
+            scale_options:scaleOptions
+        }
+        await question_table.create(obj);  
+    }
 })
 
 
