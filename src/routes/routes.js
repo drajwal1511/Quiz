@@ -4,7 +4,6 @@ const quiz_table = require('../models/quiz_table');
 const question_table = require('../models/question_table');
 const sequelize = require('sequelize');
 require('../db/sql');
-const multer = require('multer');
 const fs = require("fs");
 const ENV = require("../../env");
 const fetch = require("node-fetch");
@@ -13,7 +12,7 @@ var cors = require('cors');
 const cmd = require("node-cmd");
 app.use(express.json())
 app.use(cors());
-
+const fileupload = require("express-fileupload");
 // {
 //     "quiz_name":"Chem",
 //     "quiz_timer":"Yes",
@@ -185,134 +184,137 @@ app.get("/questions", async (req, res) => {
 //     "question_explaination":"Explain"
 // }
 
-// The disk storage engine gives you full control on storing files to disk.
-var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads')
-    },
-    filename: function (req, file, cb) {
-        cb(null, file.fieldname + '-' + Date.now())
-    }
-})
-var upload = multer({ storage: storage })
 // for multiple files
-var cpUpload = upload.fields([{ name: 'question_body_img_url', maxCount: 1 }]);
-app.post("/create-question", cpUpload, async (req, res) => {
+app.post("/create-question", async (req, res) => {
     // if there is img with the body
-    if (req.files.question_body_img_url.length != 0) {
-        var body_img = req.files.question_body_img_url[0];
-        var url = "https://storage.bunnycdn.com/" + ENV.SZ_NAME + "/" + ENV.SZ_PATH + "/" + body_img.filename;
-        await fetch(url, { method: 'PUT', headers: { Accept: 'application/json', AccessKey: ENV.SZ_ACCESS_KEY }, body: fs.createReadStream(body_img.path) })
-            .then(data => data.json())
-            .then(jsond => console.log(jsond))
-        // setting body img url 
-        req.body.question_body_img_url = "https://" + ENV.PZ_HOST_NAME + ENV.SZ_PATH + "/" + body_img.filename;
-    } else {
-        req.body.question_body_img_url = null;
-    }
-    console.log(req.body.question_body_img_url);
-    let {
-        question_tag_1,
-        question_tag_2,
-        question_body,
-        question_body_img_url,
-        question_type,
-        question_options,//[[body,body_img_url]]
-        scale_options,//[[scalename1, scalevalue1]]
-        match_options,//[[option1(a)body, option1(a)url, option1(b)body, option1(b)url]]
-        question_answer,
-        question_explanation
-    } = req.body;
+    console.log(req.files);
+    console.log(req.body);
+    // if (req.files.question_body_img_url.length != 0) {
+    //     var body_img = req.files.question_body_img_url[0];
+    //     var url = "https://storage.bunnycdn.com/" + ENV.SZ_NAME + "/" + ENV.SZ_PATH + "/" + body_img.filename;
+    //     await fetch(url, { method: 'PUT', headers: { Accept: 'application/json', AccessKey: ENV.SZ_ACCESS_KEY }, body: fs.createReadStream(body_img.path) })
+    //         .then(data => data.json())
+    //         .then(jsond => console.log(jsond))
+    //     // setting body img url 
+    //     req.body.question_body_img_url = "https://" + ENV.PZ_HOST_NAME + ENV.SZ_PATH + "/" + body_img.filename;
+    // } else {
+    //     req.body.question_body_img_url = null;
+    // }
+    // console.log(req.body.question_body_img_url);
+    // let {
+    //     question_tag_1,
+    //     question_tag_2,
+    //     question_body,
+    //     question_body_img_url,
+    //     question_type,
+    //     question_options,//[[body,body_img_url]]
+    //     scale_options,//[[scalename1, scalevalue1]]
+    //     match_options,//[[option1(a)body, option1(a)url, option1(b)body, option1(b)url]]
+    //     question_answer,
+    //     question_explanation
+    // } = req.body;
 
-    const questions = await question_table.create(
-        {
-            question_tag_1: question_tag_1,
-            question_tag_2: question_tag_2,
-            question_body: question_body,
-            question_body_img_url: question_body_img_url,
-            question_type: question_type,
-            question_options: question_options,//[[body,body_img_url]]
-            scale_options: scale_options,//[[scalename1, scalevalue1]]
-            match_options: match_options,//[[option1(a)body, option1(a)url, option1(b)body, option1(b)url]]
-            question_answer: question_answer,
-            question_explanation: question_explanation
+    // const questions = await question_table.create(
+    //     {
+    //         question_tag_1: question_tag_1,
+    //         question_tag_2: question_tag_2,
+    //         question_body: question_body,
+    //         question_body_img_url: question_body_img_url,
+    //         question_type: question_type,
+    //         question_options: question_options,//[[body,body_img_url]]
+    //         scale_options: scale_options,//[[scalename1, scalevalue1]]
+    //         match_options: match_options,//[[option1(a)body, option1(a)url, option1(b)body, option1(b)url]]
+    //         question_answer: question_answer,
+    //         question_explanation: question_explanation
+    //     }
+    // )
+    //     .then(() => {
+    //         res.status(200).json({
+    //             success: 1
+    //         })
+    //     })
+    //     .catch((error) => {
+    //         res.status(500).json({
+    //             success: 0,
+    //             error: error
+    //         })
+    //     })
+})
+
+
+
+app.post("/create-bulk", async (req, res) => {
+    // console.log(req.files);
+    var file = req.files;
+    file = file['bulk-file'];
+    var fileName = file.name.substring(0, file.name.indexOf(".csv")) + Date.now();
+    var command = './uploads/' + fileName;
+    file.mv(
+        command, (err) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({
+                    success: 0,
+                    error: 'could not upload file',
+                    errorReturned: JSON.stringify(err),
+                });
+            }
         }
     )
-        .then(() => {
-            res.status(200).json({
-                success: 1
-            })
-        })
-        .catch((error) => {
-            res.status(500).json({
-                success: 0,
-                error: error
-            })
-        })
-})
-
-var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads')
-    },
-    filename: function (req, file, cb) {
-        cb(null, file.fieldname + '-' + Date.now())
-    }
-})
-var upload = multer({ storage: storage })
-// name of file is assumed csvFileBulk, this route will accept a csv file and create those mcq questions
-app.post("/create-bulk", upload.single('bulk-file'), async (req, res) => {
     var excelData = [];
     console.log("Starting to read file");
-    fs.createReadStream("./uploads/" + req.file.filename)
+    fs.createReadStream("./uploads/" + fileName)
         .pipe(csv())
         .on('data', async data => {
             data = Object.entries(data);
             excelData.push(data);
         })
         .on('end', async () => {
-            console.log("CLOSED");
-            console.log("removing file");
-            const commandToRun = 'rm -r ./uploads/' + req.file.filename;
-            console.log(commandToRun);
-            const commands = cmd.runSync(commandToRun);
-            console.log(commands);
-            var allPromises = excelData.map(async data => {
-                var countOptions = data[8][1].split(",");
-                if (countOptions.length == 1) {
-                    questionType = "single_correct_question";
-                } else {
-                    questionType = "multiple_correct_question";
-                }
-                var questionOption = "[[\"";
-                questionOption += data[4][1];
-                questionOption += "\",null],[\"";
-                questionOption += data[5][1];
-                questionOption += "\",null],[\"";
-                questionOption += data[6][1];
-                questionOption += "\",null],[\"";
-                questionOption += data[6][1];
-                questionOption += "\",null]]";
-                // console.log(questionOption);
-                var questionAnswer = "[";
-                questionAnswer += data[8][1];
-                questionAnswer += "]";
-                // console.log(questionAnswer);
-                return question_table.create({
-                    question_tag_1: data[0][1],
-                    question_tag_2: data[1][1],
-                    question_body: data[2][1],
-                    question_type: questionType,
-                    question_options: questionOption,
-                    question_answer: questionAnswer
+            try {
+                console.log("CLOSED");
+                console.log("removing file");
+                const commandToRun = 'rm -r ./uploads/\'' + fileName + '\'';
+                console.log(commandToRun);
+                const commands = cmd.runSync(commandToRun);
+                console.log(commands);
+                var allPromises = excelData.map(async data => {
+                    var countOptions = data[8][1].split(",");
+                    if (countOptions.length == 1) {
+                        questionType = "single_correct_question";
+                    } else {
+                        questionType = "multiple_correct_question";
+                    }
+                    var questionOption = "[[\"";
+                    questionOption += data[4][1];
+                    questionOption += "\",null],[\"";
+                    questionOption += data[5][1];
+                    questionOption += "\",null],[\"";
+                    questionOption += data[6][1];
+                    questionOption += "\",null],[\"";
+                    questionOption += data[6][1];
+                    questionOption += "\",null]]";
+                    // console.log(questionOption);
+                    var questionAnswer = "[";
+                    questionAnswer += data[8][1];
+                    questionAnswer += "]";
+                    // console.log(questionAnswer);
+                    return question_table.create({
+                        question_tag_1: data[0][1],
+                        question_tag_2: data[1][1],
+                        question_body: data[2][1],
+                        question_type: questionType,
+                        question_options: questionOption,
+                        question_answer: questionAnswer
+                    })
                 })
-            })
-            const results = await Promise.all(allPromises.map(p => p.catch(e => e)));
-            const validResults = results.filter(result => !(result instanceof Error));
-            // console.log(validResults);
-            res.sendStatus(200).json({
-                success: 1
-            })
+                const results = await Promise.all(allPromises.map(p => p.catch(e => e)));
+                // const validResults = results.filter(result => !(result instanceof Error));
+                // console.log(validResults);
+                return res.send("Done");
+            } catch (e) {
+                console.error(e);
+            }
+
         })
 })
 module.exports = app;

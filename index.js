@@ -7,8 +7,7 @@ const swaggerUi = require('swagger-ui-express');
 const cors = require("cors");
 require('./src/models/question_table');
 require('./src/models/quiz_table');
-
-
+const fileupload = require('express-fileupload');
 //Swagger initialization
 const swaggerOptions = {
     swaggerDefinition: {
@@ -100,6 +99,10 @@ app.use(
         credentials: true,
     })
 );
+// Body Parser
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+app.use(fileupload());
 app.use('/', routes);
 
 app.listen(PORT, () => {
