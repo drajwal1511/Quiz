@@ -35,7 +35,16 @@ const quiz_table = db.define('quiz_table', {
     quiz_questions: {
         type: DataTypes.TEXT('long'),
         allowNull: false,
+    },
+    quiz_start_time:{
+        type:DataTypes.STRING,
+        allowNull:false
+    },
+    quiz_end_time:{
+        type:DataTypes.STRING,
+        allowNull:false
     }
+
 });
 
 db.sync();

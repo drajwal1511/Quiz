@@ -39,6 +39,15 @@ app.post('/create', async (req, res) => {
     //Does the quiz have sections
     //No=>section_name="", and set quiz_questions section_name="", pos_marks=pos_marks, neg_marks=neq_marks
     //Yes=>For each section set quiz_questions
+    var d = new Date(req.body.quiz_start_time);
+    var startTime = '[';
+    startTime+=(d.getDate()+','+(d.getMonth()+1)+','+d.getFullYear()+','+d.getHours()+','+d.getMinutes()+','+d.getSeconds());
+    startTime+=']';
+    d=new Date(req.body.quiz_end_time);
+    var endTime = '[';
+    endTime+=(d.getDate()+','+(d.getMonth()+1)+','+d.getFullYear()+','+d.getHours()+','+d.getMinutes()+','+d.getSeconds());
+    endTime+=']';
+    // console.log(startTime,endTime);
     var quizTimer = "Yes";
     var quizTimerType = null;
     var quizTimerTime = null;
@@ -141,7 +150,9 @@ app.post('/create', async (req, res) => {
         quiz_timer_time: quizTimerTime,
         quiz_have_sections: quizHaveSections,
         quiz_section_info: quizSectionsInfo,
-        quiz_questions: quizQuestions
+        quiz_questions: quizQuestions,
+        quiz_start_time:startTime,
+        quiz_end_time:endTime
     }
     const newQuiz = await quiz_table.create(obj)
         .then(() => {
